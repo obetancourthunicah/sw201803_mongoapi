@@ -65,6 +65,23 @@ module.exports = function (db) {
 
     // ruta devuela los producto con precio menor o igual a un parametro
     
+    router.get('/bytag/:tag', function(req, res, next){
+      var tag = req.params.tag;
+      var _query = {"tag": tag};
+      productosColl.find(_query).toArray(function(err, productos){
+        if(err) return res.status(500).json({"error":"Errora al extraer por tag"});
+        return res.status(200).json(productos);
+      });
+    }); //by tag
+
+    router.put('/byid/:codigo/tag/:tag', function(req, res, next){
+      var query = {"codigo": req.params.codigo};
+      var upd = {"$push":{"tag": req.params.tag}};
+      productosColl.updateOne(query, upd, function(err, result){
+        if(err) return res.status(500).json({"error":"Error al agregar etiqueta"});
+        return res.status(200).json({"status":"ok"});
+      });
+    });
 
 
   return router;
