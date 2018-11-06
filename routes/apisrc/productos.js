@@ -82,7 +82,33 @@ module.exports = function (db) {
         return res.status(200).json({"status":"ok"});
       });
     });
-
-
+    /*
+    "_id" : ObjectId("5bcfbd21ba7ca8ff141c2f15"),
+	"codigo" : "prd001",
+	"descripcion" : "Producto X de Demo",
+	"precio" : 123.23,
+	"iva" : 0.16,
+	"fecha" : 1540340909734,
+	"tag" : [
+		"retail",
+		"high"
+	],
+	"stock" : 5
+    */
+    /// Crear un nuevo producto
+    router.post('/new',  (req, res, next) => {
+      // var _nuevoProducto = Object.assign({},req.body);
+      // unmutabilidad de objetos
+      let _nuevoProducto = { ...req.body };
+      _nuevoProducto.iva = parseFloat(_nuevoProducto.iva);
+      _nuevoProducto.stock = parseInt(_nuevoProducto.stock);
+      _nuevoProducto.fecha = new Date().getTime();
+      _nuevoProducto.precio = parseFloat(_nuevoProducto.precio);
+      productosColl.insert(_nuevoProducto, (err, rslt) => {
+        if(err) return res.status(500).json({"error":"Error al guardar productos"});
+        return  res.status(203).json({"message":"Producto Guardado Exitosamente"});
+      });//end insert
+    }
+    );// end new
   return router;
 }
