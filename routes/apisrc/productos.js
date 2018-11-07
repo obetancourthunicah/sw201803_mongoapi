@@ -7,28 +7,19 @@ var router = express.Router();
 
 module.exports = function (db) {
 
-  //Definimos la colección que vamos a utilizar para obtener la data
-  var productosColl = db.collection('productos');
 
+  const productos = require('./productos.model')(db);
   // declaramos la ruta de las entidades
   // al final en el browser o postman podremos
   // probar con https://localhost:3000/api/productos/getall
 
   router.get('/getall', function (req, res, next) {
-
     // llamamos al método find de la colección sin parametros para
     // obtener todos los documentos almacenados
     // luego usamos el método getArray para convertir el cursor
     // en un arreglo que podamos utilizar.
-
-    productosColl.find().toArray(function (err, docs) {
-      // si hay un error devolvemos al cliente un error con mensaje
-      if (err) {
-        return res.status(404).json({ "error": "Error al buscar" });
-      }
-
-      // Si no hay error le devolvemos las coleccion de documentos en
-      // la colección.
+    productos.many( {}, (err, docs) => {
+      if (err) return res.status(404).json({ "error": "Error al buscar" });
       return res.status(200).json(docs);
     });
   }); // end get
@@ -36,10 +27,10 @@ module.exports = function (db) {
   router.get('/byid/:codigo', function(req, res, next) {
     var codigo = req.params.codigo;
     var query = {"codigo": codigo};
-    productosColl.findOne(query, function(err, producto){
+    productos.one(query, (err, producto)=>{
       if(err) return res.status(500).json({"error":"error al extraer documento solicitado."});
       return res.status(200).json(producto);
-    }); // end findone
+    }); // end productoOne
   } ); // end get by id
 
   router.get('/price/range/:from/:to/:includeEndPoints',
@@ -56,7 +47,7 @@ module.exports = function (db) {
           "precio": { "$gte": _from , "$lte": _to }
         }
       }
-      productosColl.find(query).toArray(function(err, productos){
+      productos.many(query, (err, productos) => {
         if(err) return res.status(500).json({"error":"Error al extraer los datos solicitados"});
         return res.status(200).json(productos);
       }); // end find toArray
@@ -64,11 +55,10 @@ module.exports = function (db) {
     );// get price range
 
     // ruta devuela los producto con precio menor o igual a un parametro
-    
     router.get('/bytag/:tag', function(req, res, next){
       var tag = req.params.tag;
       var _query = {"tag": tag};
-      productosColl.find(_query).toArray(function(err, productos){
+      productos.many(_query, (err, productos) => {
         if(err) return res.status(500).json({"error":"Errora al extraer por tag"});
         return res.status(200).json(productos);
       });
@@ -77,7 +67,7 @@ module.exports = function (db) {
     router.put('/byid/:codigo/tag/:tag', function(req, res, next){
       var query = {"codigo": req.params.codigo};
       var upd = {"$push":{"tag": req.params.tag}};
-      productosColl.updateOne(query, upd, function(err, result){
+      productos.upd(query, upd, (err, result) => {
         if(err) return res.status(500).json({"error":"Error al agregar etiqueta"});
         return res.status(200).json({"status":"ok"});
       });
@@ -104,11 +94,18 @@ module.exports = function (db) {
       _nuevoProducto.stock = parseInt(_nuevoProducto.stock);
       _nuevoProducto.fecha = new Date().getTime();
       _nuevoProducto.precio = parseFloat(_nuevoProducto.precio);
-      productosColl.insert(_nuevoProducto, (err, rslt) => {
+      productos.new(_nuevoProducto, (err, rslt) => {
         if(err) return res.status(500).json({"error":"Error al guardar productos"});
         return  res.status(203).json({"message":"Producto Guardado Exitosamente"});
       });//end insert
     }
     );// end new
+
+    router.delete('/byid/:id', (req, res, next)=>{
+        productos.del(req.params.id, (err, rslt)=>{
+          if (err) return res.status(500).json({"error":"No se pudo eliminar documento"});
+          return res.status(200).json({"msg":"Ok"});
+        });
+    });// delete
   return router;
 }
