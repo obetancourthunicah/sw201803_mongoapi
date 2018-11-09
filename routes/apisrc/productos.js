@@ -107,5 +107,21 @@ module.exports = function (db) {
           return res.status(200).json({"msg":"Ok"});
         });
     });// delete
+
+    // proyeccion 
+    // order 
+
+    // select usuariocod, usurioname, usuarioest from  ususario;
+    // p = {"atributo":1, "atrubuto2":1} ?codigo=adsfa&tag="valor"
+ router.get('/all/:pageitems/:page', (req, res, next)=>{
+  let filter = req.query;
+  let pageItems = parseInt(req.params.pageitems);
+  let page = parseInt(req.params.page);
+  productos.getByPage(filter,pageItems, page, (err, _productos)=>{
+    if(err) return res.status(500).json({"error":"Error al obtener los datos"});
+    return res.status(200).json(_productos);
+  } );
+ });// get producto
+
   return router;
 }

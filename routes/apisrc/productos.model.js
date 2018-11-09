@@ -35,5 +35,18 @@ module.exports = ( db ) => {
         return callback(null, rslt);
       });
     },
+    "getByPage": (filter, pageLimit, pageNumber, callback) => {
+      productosColl.find(filter, 
+        {
+          "projection": {"codigo":1, "descripcion":1},
+          "sort": [ ["codigo", -1] ],
+          "skip": (pageNumber -1) * pageLimit,
+          "limit": pageLimit
+        }
+      ).toArray((err, productos)=>{
+        if(err) return callback(err, null);
+        return callback(null, productos);
+      })
+    }
   }
 }
