@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var lessMiddleware = require('less-middleware');
 var logger = require('morgan');
+var session = require('express-session');
 
 var appInit = function (db) {
   var indexRouter = require('./routes/index');
@@ -15,6 +16,12 @@ var appInit = function (db) {
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'hbs');
 
+  app.use(session({
+    secret:"cuando los mininos no estan mickey cumple 90",
+    resave: false,
+    saveUninitialized : true
+  }));
+  
   app.use(logger('dev'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
