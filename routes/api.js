@@ -22,7 +22,7 @@ module.exports = function (db) {
               .json({"error":"No tiene autorizacion de usar este endpoint"})
             ;
   }
-  router.user('/security', securityApi);
+  router.use('/security', securityApi);
   router.use('/productos', isAuthenticate , productosApi);
 
   return router;

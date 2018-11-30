@@ -1,9 +1,9 @@
 var express = require('express');
-var router =  expres.Router();
+var router =  express.Router();
 function routerInit(db){
   router.post('/login', function(req, res, next){
-    if( req.body.user === "admin" && req.body.pswd == "notallowed"){
-      req.session.user = "admin";
+    if( req.body.user === "admin@admin.com" && req.body.pswd == "notallowed"){
+      req.session.user = "admin@admin.com";
       return res.status(200).json({"status":"logged"});
     }else{
       return res.status(404).json({ "status": "NotAllowed" });
