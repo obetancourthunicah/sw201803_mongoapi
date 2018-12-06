@@ -26,8 +26,8 @@ module.exports = function (db) {
 
   router.get('/byid/:codigo', function(req, res, next) {
     var codigo = req.params.codigo;
-    var query = {"codigo": codigo};
-    productos.one(query, (err, producto)=>{
+    //var query = {"_id": codigo};
+    productos.one(codigo, (err, producto)=>{
       if(err) return res.status(500).json({"error":"error al extraer documento solicitado."});
       return res.status(200).json(producto);
     }); // end productoOne

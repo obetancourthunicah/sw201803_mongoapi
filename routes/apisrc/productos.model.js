@@ -11,9 +11,9 @@ module.exports = ( db ) => {
       });
     },
     "one": (query, callback) => {
-      productosColl.findOne(query, (err, producto) => {
+      productosColl.findOne({"_id": new ObjectID(query)}, (err, producto) => {
         if (err) return callback(err, null);
-        return callbacl(null, producto);
+        return callback(null, producto);
       });
     },
     "upd" : (query, upd, callback) => {
